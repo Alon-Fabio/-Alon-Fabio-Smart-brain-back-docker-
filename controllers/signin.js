@@ -1,45 +1,51 @@
 const jwt = require("jsonwebtoken");
 
-const handleSignin = (db, bcrypt, email, password) => {
-  console.log("handle signin", email, password);
+const redis = require("redis");
+const redisClient = redis.createClient(process.env.REDIS_URI);
+
+const dataFetch = (db, bcrypt, req) => {
+  const { email, password } = req.body;
+
   if (!email || !password) {
     console, log("No email of pass");
     return Promise.reject("incorrect form submission");
   }
-  console.log("past the beriar");
 
-  db.select("email", "hash")
+  return db
+    .select("email", "hash")
     .from("login")
     .where("email", "=", email)
     .then((data) => {
       const isValid = bcrypt.compareSync(password, data[0].hash);
-      console.log(isValid);
+
       if (isValid) {
         return db
           .select("*")
           .from("users")
-          .where("email", "=", "admin@amail.com")
+          .where("email", "=", email)
           .then((user) => {
-            console, log("the user ##########", user);
             return user[0];
           })
-          .catch((err) => res.status(400).json("unable to get user"));
+          .catch((err) => Promise.reject(err));
       } else {
-        return Promise.reject("wrong credentials");
+        return Promise.reject("Sorry.. something went wrong.. please try");
       }
     })
-    .catch((err) => err);
+    .catch((err) =>
+      Promise.reject("Sorry.. something went wrong.. please try")
+    );
 };
 
 const getAuthTokenID = () => {
-  console.log("get auth");
+  console.log("Fuckkkk");
 };
 
 const setToken = (email) => {
   const jwtPayload = email;
-  return (token = jwt.sign(jwtPayload, "jwt secret CHANGE to env var", {
-    expiresIn: "2 days",
-  }));
+  token = jwt.sign({jwtPayload}, process.env.JWT_SECRET, {
+    expiresIn: "2d",
+  });
+  return token;
 };
 const createSession = (user) => {
   //JWT web token. return user
@@ -48,13 +54,16 @@ const createSession = (user) => {
   return { success: "true", userId: id, token };
 };
 const signinAuthentication = (db, bcrypt) => (req, res) => {
-  const { email, password } = req.body;
-  console.log(req.body);
-  // const { authorization } = req.headers;
-  return false
+  const { authorization } = req.headers;
+  return authorization
     ? getAuthTokenId(req, res)
-    : handleSignin(db, bcrypt, email, password)
-        .then((session) => res.json(session))
+    : dataFetch(db, bcrypt, req)
+        .then((dataFromDb) => {
+          return dataFromDb.id && dataFromDb.email
+            ? createSession(dataFromDb)
+            : Promise.reject(dataFromDb);
+        })
+        .then((userData) => res.json(userData))
         .catch((err) => res.status(400).json(err));
 };
 

@@ -7,6 +7,11 @@ services:
     build: ./
     environment:
       POSTGRES_URI: postgres://fabio:secret@postgres:5432/smart-brain-docker
+      REDIS_URI: redis://redis:6379
+      JWT_SECRET: jsonWebTokenSecret
+    links:
+      - postgres
+      - redis
     command: npm start
     working_dir: /usr/src/smart-brain-api
     ports:
@@ -31,3 +36,9 @@ services:
     restart: always
     ports:
       - 8080:8080
+
+  # redis
+  redis:
+    image: redis
+    ports:
+      - 6379:6379
