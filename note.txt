@@ -1,0 +1,6 @@
+docker image name: firstsmart
+
+To connect to the dockers DB:
+1. Get to the docker-machine ip. Get the ip by running 'docker-machine ip default'(http://192.168.99.100:8080/).
+2. Go to in the browser <machine-ip>:<adminer.port>. This will prompt a GUI.
+3. Select type of DB, Server = DB name, user = DB user, pass = DB pass, database = database.
