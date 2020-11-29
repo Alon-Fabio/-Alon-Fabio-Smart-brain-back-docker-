@@ -7,7 +7,7 @@ const dataFetch = (db, bcrypt, req) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
-    console, log("No email of pass");
+    console.log("No email of pass");
     return Promise.reject("incorrect form submission");
   }
 
@@ -36,27 +36,45 @@ const dataFetch = (db, bcrypt, req) => {
     );
 };
 
-const getAuthTokenID = () => {
-  console.log("Fuckkkk");
+const getAuthTokenId = (authorization) => {
+  return new Promise((resolve, reject) => {
+    return redisClient.get(authorization, (err, reply) => {
+      if (err || !reply) {
+        return reject(err);
+      }
+      return resolve({ id: reply });
+    });
+  });
 };
 
-const setToken = (email) => {
+const signToken = (email) => {
   const jwtPayload = email;
-  token = jwt.sign({jwtPayload}, process.env.JWT_SECRET, {
+  token = jwt.sign({ jwtPayload }, process.env.JWT_SECRET, {
     expiresIn: "2d",
   });
   return token;
 };
+
+const setToken = (token, id) => {
+  return Promise.resolve(redisClient.set(token, id));
+};
+
 const createSession = (user) => {
   //JWT web token. return user
   const { email, id } = user;
-  const token = setToken(email);
-  return { success: "true", userId: id, token };
+  const token = signToken(email);
+  return setToken(token, id)
+    .then(() => {
+      return { success: "true", userId: id, token };
+    })
+    .catch(console.log);
 };
 const signinAuthentication = (db, bcrypt) => (req, res) => {
-  const { authorization } = req.headers;
-  return authorization
-    ? getAuthTokenId(req, res)
+  const { authentication } = req.headers;
+  return authentication
+    ? getAuthTokenId(authentication)
+        .then((userData) => res.json(userData))
+        .catch((err) => res.status(400).json(err))
     : dataFetch(db, bcrypt, req)
         .then((dataFromDb) => {
           return dataFromDb.id && dataFromDb.email
