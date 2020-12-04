@@ -40,7 +40,7 @@ const getAuthTokenId = (authorization) => {
   return new Promise((resolve, reject) => {
     return redisClient.get(authorization, (err, reply) => {
       if (err || !reply) {
-        return reject(err);
+        return reject(err || "no data");
       }
       return resolve({ id: reply });
     });
@@ -87,4 +87,5 @@ const signinAuthentication = (db, bcrypt) => (req, res) => {
 
 module.exports = {
   signinAuthentication: signinAuthentication,
+  redisClient: redisClient,
 };
