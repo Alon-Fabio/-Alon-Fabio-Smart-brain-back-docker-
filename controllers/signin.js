@@ -73,7 +73,7 @@ const signinAuthentication = (db, bcrypt) => (req, res) => {
   const { authentication } = req.headers;
   return authentication
     ? getAuthTokenId(authentication)
-        .then((userData) => res.json(userData))
+        .then((userData) => res.status(200).json(userData))
         .catch((err) => res.status(400).json(err))
     : dataFetch(db, bcrypt, req)
         .then((dataFromDb) => {
@@ -81,7 +81,7 @@ const signinAuthentication = (db, bcrypt) => (req, res) => {
             ? createSession(dataFromDb)
             : Promise.reject(dataFromDb);
         })
-        .then((userData) => res.json(userData))
+        .then((userData) => res.status(200).json(userData))
         .catch((err) => res.status(400).json(err));
 };
 

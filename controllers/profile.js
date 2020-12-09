@@ -5,7 +5,7 @@ const handleProfileGet = (req, res, db) => {
     .where({ id })
     .then((user) => {
       if (user.length) {
-        res.json(user[0]);
+        res.status(200).json(user[0]);
       } else {
         res.status(400).json("Not found");
       }
@@ -16,13 +16,13 @@ const handleProfileGet = (req, res, db) => {
 const handleProfilePost = (req, res, db) => {
   const { id } = req.params;
   const { name, age, pet } = req.body.formInput;
-  console.log(name);
+
   db("users")
     .where({ id })
-    .update({ name })
+    .update({ name, pet, age })
     .then((resp) => {
       if (resp) {
-        res.json("success");
+        res.status(200).json("success");
       } else {
         res.status(400).json("request failed");
       }
