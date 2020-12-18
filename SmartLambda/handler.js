@@ -1,14 +1,19 @@
 "use strict";
-const emojis = ["😪", "😶", "😏", "😊", "😎", "😀", "😍", "😝"];
+const emojis = ["😄", "😃", "😀", "😊", "😉", "😍", "🔶", "🔷", "🚀"];
 module.exports.rank = async (event) => {
-  const rank = event.queryStringParameters.rank;
-  const rankRank = emojis[rank > emojis.length ? emojis.length - 1 : rank];
+  const userRank = event.queryStringParameters.rank;
+  const Rank = emojis[userRank >= emojis.length ? emojis.length - 1 : userRank];
   return {
     statusCode: 200,
+    headers: {
+      "Access-Control-Allow-Headers": "*",
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET",
+    },
     body: JSON.stringify(
       {
-        message: "Go Serverless v1.0! Your function executed successfully!",
-        input: rankRank,
+        message: "Rank generated!",
+        input: Rank,
       },
       null,
       2

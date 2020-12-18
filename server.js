@@ -11,6 +11,17 @@ const profile = require("./controllers/profile");
 const image = require("./controllers/image");
 const auth = require("./controllers/auth");
 
+const whitelist = ["http://localhost:3001"];
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (whitelist.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+};
+
 const db = knex({
   // connect to your own database here
   client: "pg",
@@ -20,7 +31,7 @@ const db = knex({
 const app = express();
 
 app.use(morgan("combined"));
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(bodyParser.json());
 
 app.get("/", (res, req) => {
