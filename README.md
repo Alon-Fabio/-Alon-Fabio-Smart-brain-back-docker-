@@ -10,7 +10,7 @@ This app will make use of APIs and libraries to figure out where are all the fac
 
 ## What is in this project?
 
-- This is a React and express build.
+- This is a React and express build with docker.
 - In this project there is authentication with hashing utilizing libraries like bcrypt-nodejs.\* Back-end build using express with morgan as logger, and two databases. One for session and one for long term data. Using Postgres for long and redis for short with knex library as a secure SQL compiler.
 - In the front I'm using React and styling with bootstrap and tachyons and particles effect.
 
